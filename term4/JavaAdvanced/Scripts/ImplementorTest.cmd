@@ -1,0 +1,2 @@
+cd..
+"C:\Program Files\Java\jdk-10\bin\java.exe" -cp ..\lib\*;..\artifacts\JarImplementorTest.jar;out\production\java-advanced-2018 info.kgeorgiy.java.advanced.implementor.Tester jar-class ru.ifmo.rain.baydyuk.implementor.Implementor

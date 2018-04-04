@@ -1,0 +1,2 @@
+cd..
+java -cp ..\lib\*;..\artifacts\IterativeParallelismTest.jar;out\production\java-advanced-2018 info.kgeorgiy.java.advanced.concurrent.Tester list ru.ifmo.rain.baydyuk.concurrent.IterativeParallelism
