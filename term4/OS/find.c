@@ -96,6 +96,13 @@ void myError(const char *message, const char *what, bool needHelp) {
     exit(EXIT_FAILURE);
 }
 
+
+/**
+ * Filter file
+ * @param _file_stat
+ * @param file
+ * @return
+ */
 int skipFile(struct stat _file_stat, const char *file) {
     return (mode._has_name && strcmp(file, mode._name) != 0) ||
            (mode._has_inode_mode && mode._inode != _file_stat.st_ino) ||
@@ -117,11 +124,14 @@ bool isNumber(char *what) {
 }
 
 void setMode(const int argN, char **args) {
-    if (strcmp(args[0], "--help")){
-        helpMenu();
-    }
+
     if (argN < 2) {
-        myError("Path should be presented", "", true);
+        myError("Invalid number of arguments", "", true);
+    }
+
+    if (strcmp(args[1], "--help") == 0) {
+        helpMenu();
+        exit(EXIT_SUCCESS);
     }
     mode._path = args[1];
     int codeError = 0;
@@ -150,13 +160,13 @@ void setMode(const int argN, char **args) {
                         if (!isNumber(*(args + i + 1) + 1)) {
                             codeError = 2;
                         } else { ;
-                            if (args[i+1][0] != '-' && args[i+1][0] != '+' && args[i+1][0] != '='){
+                            if (args[i + 1][0] != '-' && args[i + 1][0] != '+' && args[i + 1][0] != '=') {
                                 myError("Invalid key for command -size", "", true);
                             }
 
                             mode._has_size_mode = true;
                             mode._size = atoll(args[i + 1]);
-                            mode._key = args[i+1][0];
+                            mode._key = args[i + 1][0];
                         }
                     }
                 } else {
