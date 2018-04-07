@@ -86,7 +86,7 @@ void helpMenu(void) {
  * Throws error which was occurred while running programme
  * @param message error message
  * @param what extra info
- * @param needHelp = true if need to suggest user
+ * @param needHelp = true if need to suggest user using operation '--help'
  */
 void myError(const char *message, const char *what, bool needHelp) {
     fprintf(stderr, "%s %s\n", message, what);
@@ -99,11 +99,11 @@ void myError(const char *message, const char *what, bool needHelp) {
 
 /**
  * Filter file
- * @param _file_stat
- * @param file
- * @return
+ * @param _file_stat information about file
+ * @param file path of file
+ * @return true if need to skip file, false otherwise 
  */
-int skipFile(struct stat _file_stat, const char *file) {
+bool skipFile(struct stat _file_stat, const char *file) {
     return (mode._has_name && strcmp(file, mode._name) != 0) ||
            (mode._has_inode_mode && mode._inode != _file_stat.st_ino) ||
            (mode._has_link_mode && mode._nlink != _file_stat.st_nlink) ||
@@ -114,6 +114,11 @@ int skipFile(struct stat _file_stat, const char *file) {
 
 }
 
+/**
+ * Check if presented string is number
+ * @param what string to check
+ * @return true if presented string is positive integer, false otherwise  
+ */
 bool isNumber(char *what) {
     for (; *what; what++) {
         if (*what != 0 && !isdigit(*what)) {
@@ -123,6 +128,11 @@ bool isNumber(char *what) {
     return true;
 }
 
+/**
+ * Parse arguments and write it in structure 'mode'
+ * @param argN number of arguments
+ * @param args presented arguments
+ */
 void setMode(const int argN, char **args) {
 
     if (argN < 2) {
@@ -204,6 +214,10 @@ void setMode(const int argN, char **args) {
     }
 }
 
+/**
+ * Execute presented command
+ * @param arg contains name of command and command args
+ */
 void execComand(char *const *arg) {
     pid_t pid = fork();
     if (pid == 0) {
@@ -223,7 +237,13 @@ void execComand(char *const *arg) {
     }
 }
 
-void listdir(char *dirpath) {
+
+/**
+ * Search files in directory 'dirpath' and uses filters frome structure 'mode' for them
+ * Recursively find all daugther directories and run this function for them
+ * @param dirpath directory for search
+ */
+void recursiveWalk(char *dirpath) {
     DIR *directory;
     if ((directory = opendir(dirpath)) == NULL) {
         myError("Error was occurred while opening directory", dirpath, false);
@@ -250,7 +270,7 @@ void listdir(char *dirpath) {
         }
         if (dir->d_type == DT_DIR) {
             if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0) {
-                listdir(file_path);
+                recursiveWalk(file_path);
             }
         } else if (stat_fail == false && !skipFile(file_stat, dir->d_name)) {
             if (mode._has_executable_file) {
@@ -271,7 +291,7 @@ void listdir(char *dirpath) {
 int main(const int argN, char **args) {
     initialize();
     setMode(argN, args);
-    listdir(mode._path);
+    recursiveWalk(mode._path);
     //error("message");
     return 0;
 }
