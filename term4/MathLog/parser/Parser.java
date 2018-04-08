@@ -51,7 +51,7 @@ public class Parser {
                 }
                 index--;
                 variable = sb.toString();
-                index--;
+                cur = Token.VAR;
             }
         }
     }
@@ -65,6 +65,7 @@ public class Parser {
                 break;
             case VAR:
                 ans = new Variable(variable);
+                getNext();
                 break;
             case LPAR:
                 ans = parseImpl();
@@ -102,7 +103,7 @@ public class Parser {
         Expression ans = parseOr();
         while (true) {
             if (cur == Token.IMPL) {
-                ans = new BinaryOperator(ans, parseOr(), "->");
+                ans = new BinaryOperator(ans, parseImpl(), "->");
             } else {
                 return ans;
             }
