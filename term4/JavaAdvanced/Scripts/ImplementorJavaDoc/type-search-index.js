@@ -1,1 +1,0 @@
-typeSearchIndex = [{"p":"ru.ifmo.rain.baydyuk.implementor","l":"Implementor"},{"p":"ru.ifmo.rain.baydyuk.implementor","l":"Implementor.UnicodeFilter"},{"p":"info.kgeorgiy.java.advanced.implementor","l":"Impler"},{"p":"info.kgeorgiy.java.advanced.implementor","l":"ImplerException"},{"p":"info.kgeorgiy.java.advanced.implementor","l":"JarImpler"}]
