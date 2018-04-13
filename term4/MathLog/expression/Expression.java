@@ -2,8 +2,14 @@ package expression;
 
 public interface Expression {
     void write(StringBuilder sb);
-    Expression getRight();
+
+    int hashCode();
+
+    boolean equals(Object obj);
+
+    String getKey();
+
     Expression getLeft();
-    int getType();
-    int hash();
+
+    Expression getRight();
 }

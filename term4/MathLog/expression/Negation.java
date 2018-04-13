@@ -2,50 +2,46 @@ package expression;
 
 import java.util.Objects;
 
-public class Variable implements Expression {
+public class Negation implements Expression {
 
-    private String name;
+    private Expression negated;
     private Integer hash;
-    //private String key;
 
-
-    public Variable(String name) {
-        this.name = name;
-        //key = "var";
-        //args = new BinaryOperator[0];
+    public Negation(Expression negated) {
+        this.negated = negated;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Variable variable = (Variable) o;
-        return Objects.equals(name, variable.name);
+        Negation negation = (Negation) o;
+        return Objects.equals(negated, negation.negated);
     }
 
     @Override
     public String getKey() {
-        return "var";
+        return "!";
     }
 
     @Override
     public Expression getLeft() {
-        return null;
+        return negated;
     }
 
     @Override
     public Expression getRight() {
-        return null;
+        return negated;
     }
 
     @Override
     public void write(StringBuilder sb) {
-        sb.append(name);
+        sb.append("!");
+        negated.write(sb);
     }
 
     @Override
     public int hashCode() {
-        return hash != null ? hash : (hash = Objects.hash(name));
+        return hash != null ? hash : (hash = Objects.hash(negated));
     }
-
 }

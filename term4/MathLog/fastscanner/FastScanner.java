@@ -7,20 +7,14 @@ public class FastScanner implements AutoCloseable {
     BufferedReader br;
     StringTokenizer st;
 
-    public FastScanner(File f) {
-        try {
-            br = new BufferedReader(new FileReader(f));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public FastScanner(File f) throws FileNotFoundException {
+        br = new BufferedReader(new FileReader(f));
     }
 
-    public String next() {
+    public String next() throws IOException {
         while (st == null || !st.hasMoreTokens()) {
             try {
                 st = new StringTokenizer(br.readLine());
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (NullPointerException e) {
                 return null;
             }
@@ -28,7 +22,7 @@ public class FastScanner implements AutoCloseable {
         return st.nextToken();
     }
 
-    public int nextInt() {
+    public int nextInt() throws IOException {
         return Integer.parseInt(next());
     }
 

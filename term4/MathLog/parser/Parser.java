@@ -1,9 +1,6 @@
 package parser;
 
-import expression.BinaryOperator;
-import expression.Expression;
-import expression.UnaryOperator;
-import expression.Variable;
+import expression.*;
 
 public class Parser {
     int index = 0;
@@ -61,7 +58,7 @@ public class Parser {
         Expression ans;
         switch (cur) {
             case NOT:
-                ans = new UnaryOperator(parseUnary(), "!");
+                ans = new Negation(parseUnary());
                 break;
             case VAR:
                 ans = new Variable(variable);
@@ -81,7 +78,7 @@ public class Parser {
         Expression ans = parseUnary();
         while (true) {
             if (cur == Token.AND) {
-                ans = new BinaryOperator(ans, parseUnary(), "&");
+                ans = new Conjunction(ans, parseUnary());
             } else {
                 return ans;
             }
@@ -92,7 +89,7 @@ public class Parser {
         Expression ans = parseAnd();
         while (true) {
             if (cur == Token.OR) {
-                ans = new BinaryOperator(ans, parseAnd(), "|");
+                ans = new Disjunction(ans, parseAnd());
             } else {
                 return ans;
             }
@@ -103,7 +100,7 @@ public class Parser {
         Expression ans = parseOr();
         while (true) {
             if (cur == Token.IMPL) {
-                ans = new BinaryOperator(ans, parseImpl(), "->");
+                ans = new Implication(ans, parseImpl());
             } else {
                 return ans;
             }

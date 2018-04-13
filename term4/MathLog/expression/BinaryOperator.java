@@ -1,45 +1,51 @@
 package expression;
 
-public class BinaryOperator implements Expression{
-    private Expression first;
-    private Expression second;
-    private String operation;
-    private Integer hashCode;
+public abstract class BinaryOperator implements Expression {
+    Expression left;
+    Expression right;
+    private String key;
+    Integer hash;
+    private StringBuilder strImpl;
 
-    public BinaryOperator(Expression first, Expression second, String operation){
-        this.operation = operation;
-        this.first = first;
-        this.second = second;
+    BinaryOperator(Expression left, Expression right, String key){
+        this.right = right;
+        this.left = left;
+        this.key = key;
     }
 
-    @Override
-    public void write(StringBuilder sb) {
-        sb.append('(');
-        sb.append(operation);
-        sb.append(',');
-        first.write(sb);
-        sb.append(',');
-        second.write(sb);
-        sb.append(')');
+    public String getKey(){
+        return key;
     }
 
     @Override
     public Expression getRight() {
-        return first;
+        return right;
     }
 
     @Override
     public Expression getLeft() {
-        return second;
+        return left;
     }
 
-    @Override
-    public int getType() {
-        return GetType.getType(operation);
-    }
 
     @Override
-    public int hash() {
-        return (hashCode != null) ? hashCode : (hashCode = ("(" + GetType.getType(operation) + ", " + first.hash() + ", " + first.hash() + ")").hashCode());
+    public String toString() {
+        if (strImpl == null) {
+            write(strImpl = new StringBuilder());
+        }
+        return strImpl.toString();
     }
+
+    public void write(StringBuilder sb){
+        sb.append('(');
+        left.write(sb);
+        sb.append(key);
+        right.write(sb);
+        sb.append(')');
+    }
+
+    /*@Override
+    public boolean equals(Object obj) {
+        return obj != null && hashCode() == obj.hashCode() && toString().equals(toString());
+    }*/
 }

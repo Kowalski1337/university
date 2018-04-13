@@ -1,148 +1,106 @@
 import expression.Expression;
+import expression.Variable;
 import fastscanner.FastScanner;
+import javafx.util.Pair;
 import parser.Parser;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 
-class HW1 {
-    private static final Map<Integer, Integer> assumptions = new HashMap<>();
+import java.nio.file.Paths;
+import java.util.HashMap;
 
-    private static final Map<Integer, List<Expression>> forr = new HashMap<>();
-    private static final Map<Integer, Integer> firstpos = new HashMap<>();
-
-
+public class HW1 {
     private static Parser parser = new Parser();
-    private static final StringBuilder sb = new StringBuilder();
-    private static Expression[] e_axioms = {
-            parser.parse("A->(B->A)"),
+    private static Expression[] axioms = new Expression[] {
+            parser.parse("A->B->A"),
             parser.parse("(A->B)->(A->B->C)->(A->C)"),
             parser.parse("A->B->A&B"),
             parser.parse("A&B->A"),
             parser.parse("A&B->B"),
             parser.parse("A->A|B"),
-            parser.parse("A->B|A"),
-            parser.parse("(A->B)->(C->B)->(A|C->B)"),
+            parser.parse("B->A|B"),
+            parser.parse("(A->C)->(B->C)->(A|B->C)"),
             parser.parse("(A->B)->(A->!B)->!A"),
             parser.parse("!!A->A")
     };
+    private static HashMap<Expression, Integer> hyp = new HashMap<>(52001, 1);
+    private static HashMap<Expression, Integer> mentioned = new HashMap<>(52001, 1);
+    private static HashMap<Expression, Pair<Expression, Expression>> mpProved = new HashMap<>(52001, 1);
+    private static HashMap<Expression, Expression> vars = new HashMap<>(52001, 1);
 
-
-    public static void main(String[] args) throws IOException {
-        FastScanner in = new FastScanner(new File("input.txt"));
-        PrintWriter out = new PrintWriter("output.txt");
-        String s;
-        int pos = 1;
-        parseFirst(in.next());
-        while ((s = in.next()) != null) {
-            parseString(s, pos);
-            pos++;
+    private static boolean compareTrees(Expression expr, Expression to, HashMap<Expression, Expression> vars) {
+        if (to instanceof Variable) {
+            if (vars.containsKey(to)) {
+                return vars.get(to).equals(expr);
+            } else {
+                vars.put(to, expr);
+                return true;
+            }
+        } else if (to.getKey().equals(expr.getKey())) {
+            return compareTrees(expr.getLeft(), to.getLeft(), vars) && compareTrees(expr.getRight(), to.getRight(), vars);
         }
-        out.write(sb.toString());
-        out.close();
+        return false;
     }
 
-    private static void parseString(String s, int pos) {
-        Expression obj = parser.parse(s);
-        int he_obj = obj.hash();
-        boolean fnd = false;
-        if (assumptions.containsKey(he_obj)) {
-            fnd = true;
-            sb.append("(").append(pos).append(") ").append(s).append(" (Предп. ").append(assumptions.get(he_obj)).append(")\n");
+    private static Pair<Integer, Integer> getMp(Expression expr) {
+        Pair<Expression, Expression> a = mpProved.get(expr);
+        if (a == null) {
+            return null;
         }
-        if (!fnd) {
-            int c = isAxiom(obj);
-            if (c > 0) {
-                fnd = true;
-                sb.append("(").append(pos).append(") ").append(s).append(" (Сх. акс. ").append(c).append(")\n");
+        Integer b = mentioned.get(a.getValue());
+        if (b == null) {
+            return null;
+        }
+        return new Pair<>(mentioned.get(a.getKey()), b);
+    }
+
+    private static void getHint(Expression expr, BufferedWriter out) throws IOException {
+        if ("->".equals(expr.getKey())) {
+            mpProved.put(expr.getRight(), new Pair<>(expr, expr.getLeft()));
+        }
+        Integer h = hyp.get(expr);
+        if (h != null) {
+            out.write("Предп. " + (h + 1));
+            return;
+        }
+        for (int i = 0; i < axioms.length; i++) {
+            vars.clear();
+            if (compareTrees(expr, axioms[i], vars)) {
+                out.write("Сх. акс. " + (i + 1));
+                return;
             }
         }
-        if (!fnd) {
-            if (forr.containsKey(he_obj)) {
-                for (Expression e : forr.get(he_obj)) {
-                    if (firstpos.containsKey(e.getLeft().hash())) {
-                        fnd = true;
-                        int bg = firstpos.get(e.hash());
-                        int lt = firstpos.get(e.getLeft().hash());
-                        sb.append("(").append(pos).append(") ").append(s).append(" (M.P. ").append(bg).append(", ").append(lt).append(")\n");
-                        break;
+        Pair<Integer, Integer> mpResult = getMp(expr);
+        out.write(mpResult == null ? "Не доказано" : "M.P. " + (mpResult.getKey() + 1) + ", " + (mpResult.getValue() + 1));
+    }
+
+    public static void main(String[] args) throws Exception {
+        try (FastScanner scanner = new FastScanner(new File("input.txt"))) {
+            String[] header = scanner.next().split("\\|-");
+            if (!header[0].isEmpty()) {
+                String[] dataStrings = header[0].split(",");
+                for (int i = 0; i < dataStrings.length; i++) {
+                    hyp.put(parser.parse(dataStrings[i]), i);
+                }
+            }
+            int counter = 1;
+            String line;
+            try (BufferedWriter out = Files.newBufferedWriter(Paths.get("output.txt"), Charset.forName("UTF-8"))) {
+                while ((line = scanner.next()) != null) {
+                    if (line.isEmpty()) {
+                        continue;
                     }
+                    Expression cur = parser.parse(line);
+                    out.write("(" + counter + ") " + line + " (");
+                    getHint(cur, out);
+                    out.write(")");
+                    out.newLine();
+                    mentioned.put(cur, counter - 1);
+                    counter++;
                 }
             }
         }
-        if (!fnd) {
-            sb.append("(").append(pos).append(") ").append(s).append(" (Не доказано)\n");
-        }
-        if (obj.getType() == 1) {
-            int rgh = obj.getRight().hash();
-            if (!forr.containsKey(rgh)) {
-                forr.put(rgh, new ArrayList<>());
-            }
-            forr.get(rgh).add(obj);
-        }
-        firstpos.put(he_obj, pos);
-
-    }
-
-    private static void parseFirst(String s) {
-        if (s.charAt(0) == '|') {
-            return;
-        }
-        String c = "";
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == '|' && s.charAt(i + 1) == '-') {
-                c = s.substring(0, i);
-            }
-        }
-        if (c.isEmpty()) {
-            return;
-        }
-        int num = 1;
-        String[] v = c.split(",");
-        for (String j : v) {
-            if (j.length() > 0) {
-                assumptions.put(parser.parse(j).hash(), num);
-                num++;
-            }
-        }
-    }
-
-
-    private static Map<Integer, Integer> exist = new HashMap<>();
-
-    private static int isAxiom(Expression e) {
-        int num = 1;
-        for (Expression s : e_axioms) {
-            exist.clear();
-            if (recAx(s, e)) {
-                return num;
-            }
-            num++;
-        }
-        return -1;
-    }
-
-    private static boolean recAx(Expression ax, Expression my) {
-        if (ax.getType() == 5) {
-            int axe = ax.hash();
-            int mye = my.hash();
-            if (exist.containsKey(axe)) {
-                return exist.get(axe).equals(mye);
-            } else {
-                exist.put(axe, mye);
-                return true;
-            }
-        }
-        if (ax.getType() == my.getType()) {
-            if (ax.getType() == 4) {
-                return recAx(ax.getLeft(), my.getLeft());
-            }
-            if (ax.getType() == my.getType()) {
-                return recAx(ax.getRight(), my.getRight()) && recAx(ax.getLeft(), my.getLeft());
-            }
-        }
-        return false;
     }
 }
