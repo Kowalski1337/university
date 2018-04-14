@@ -63,3 +63,5 @@ hs_err_pid*
 *.js
 *.css
 *.png
+Find/cmake-build-debug/
+Jit/cmake-build-debug/
