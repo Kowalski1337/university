@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 /**
- * Type error message 
+ * Type error message
  * @param message describe error
  */
 void error(char *message) {
