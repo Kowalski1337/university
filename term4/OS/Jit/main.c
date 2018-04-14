@@ -5,6 +5,10 @@
 #include <sys/mman.h>
 #include <stdlib.h>
 
+/**
+ * Type error message 
+ * @param message describe error
+ */
 void error(char *message) {
     fprintf(stderr, "%s", message);
     exit(EXIT_FAILURE);
