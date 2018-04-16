@@ -41,10 +41,7 @@ public class Main {
         }
     }
 
-    private static int dfs(int n, int m, int v, int C) {
-        if (v < n && visited.get(v)) {
-            return 0;
-        }
+    private static int dfs(int n, int v, int C) {
         if (v == n - 1) {
             return C;
         }
@@ -52,14 +49,12 @@ public class Main {
         for (Pair<Integer, Integer> temp : g.get(v)) {
             int vertex = temp.getKey();
             int id = temp.getValue();
-            if (vertex < n && id < 2 * m && edges.get(id).getBackId() < 2 * m) {
-                if (!visited.get(vertex) && edges.get(id).getCapacity() > edges.get(id).getFlow()) {
-                    int d = dfs(n, m, vertex, Math.min(C, edges.get(id).getCapacity() - edges.get(id).getFlow()));
-                    if (d > 0) {
-                        edges.get(id).increaseFlow(d);
-                        edges.get(edges.get(id).getBackId()).increaseFlow(-d);
-                        return d;
-                    }
+            if (!visited.get(vertex) && edges.get(id).getCapacity() > edges.get(id).getFlow()) {
+                int d = dfs(n, vertex, Math.min(C, edges.get(id).getCapacity() - edges.get(id).getFlow()));
+                if (d > 0) {
+                    edges.get(id).increaseFlow(d);
+                    edges.get(edges.get(id).getBackId()).increaseFlow(-d);
+                    return d;
                 }
             }
         }
@@ -103,7 +98,7 @@ public class Main {
             int ans = 0;
             while (true) {
                 clear();
-                int d = dfs(n, m, 0, Integer.MAX_VALUE);
+                int d = dfs(n,0, Integer.MAX_VALUE);
                 ans += d;
                 if (d == 0) {
                     break;
