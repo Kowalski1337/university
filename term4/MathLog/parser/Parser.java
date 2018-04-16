@@ -3,9 +3,9 @@ package parser;
 import expression.*;
 
 public class Parser {
-    int index = 0;
+    private int index = 0;
     private String expression;
-    Token cur;
+    private Token cur;
     private String variable;
 
     private enum Token {AND, OR, IMPL, VAR, LPAR, RPAR, NOT}
@@ -74,7 +74,7 @@ public class Parser {
         return ans;
     }
 
-    Expression parseAnd() {
+    private Expression parseAnd() {
         Expression ans = parseUnary();
         while (true) {
             if (cur == Token.AND) {
@@ -85,7 +85,7 @@ public class Parser {
         }
     }
 
-    Expression parseOr() {
+    private Expression parseOr() {
         Expression ans = parseAnd();
         while (true) {
             if (cur == Token.OR) {
@@ -96,7 +96,7 @@ public class Parser {
         }
     }
 
-    Expression parseImpl() {
+    private Expression parseImpl() {
         Expression ans = parseOr();
         while (true) {
             if (cur == Token.IMPL) {

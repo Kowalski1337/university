@@ -4,8 +4,8 @@ import java.util.*;
 import java.io.*;
 
 public class FastScanner implements AutoCloseable {
-    BufferedReader br;
-    StringTokenizer st;
+    private BufferedReader br;
+    private StringTokenizer st;
 
     public FastScanner(File f) throws FileNotFoundException {
         br = new BufferedReader(new FileReader(f));
@@ -20,10 +20,6 @@ public class FastScanner implements AutoCloseable {
             }
         }
         return st.nextToken();
-    }
-
-    public int nextInt() throws IOException {
-        return Integer.parseInt(next());
     }
 
     @Override

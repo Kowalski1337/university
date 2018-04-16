@@ -4,17 +4,16 @@ import fastscanner.FastScanner;
 import javafx.util.Pair;
 import parser.Parser;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
 
 public class HW1 {
-    private static StringBuilder ans = new StringBuilder();
-    public static Parser parser = new Parser();
+    private static Parser parser = new Parser();
     private static Expression[] axioms = new Expression[] {
             parser.parse("A->B->A"),
             parser.parse("(A->B)->(A->B->C)->(A->C)"),
@@ -32,17 +31,6 @@ public class HW1 {
     private static HashMap<Expression, Pair<Expression, Expression>> mpProved = new HashMap<>(52001, 1);
     private static HashMap<Expression, Expression> vars = new HashMap<>(52001, 1);
 
-    public static Integer isAxiom(Expression e) {
-        int num = 1;
-        for (Expression s : axioms) {
-            vars.clear();
-            if (compareTrees(s, e, vars)) {
-                return num;
-            }
-            num++;
-        }
-        return null;
-    }
     private static boolean compareTrees(Expression expr, Expression to, HashMap<Expression, Expression> vars) {
         if (to instanceof Variable) {
             if (vars.containsKey(to)) {
