@@ -1,0 +1,12 @@
+Dump of assembler code for function pow2:
+   0x000000000000079a <+0>:	55	push   %rbp
+   0x000000000000079b <+1>:	48 89 e5	mov    %rsp,%rbp
+   0x000000000000079e <+4>:	89 7d fc	mov    %edi,-0x4(%rbp)
+   0x00000000000007a1 <+7>:	8b 45 fc	mov    -0x4(%rbp),%eax
+   0x00000000000007a4 <+10>:	ba 01 00 00 00	mov    $0x1,%edx
+   0x00000000000007a9 <+15>:	89 c1	mov    %eax,%ecx
+   0x00000000000007ab <+17>:	d3 e2	shl    %cl,%edx
+   0x00000000000007ad <+19>:	89 d0	mov    %edx,%eax
+   0x00000000000007af <+21>:	5d	pop    %rbp
+   0x00000000000007b0 <+22>:	c3	retq   
+End of assembler dump.

@@ -92,8 +92,8 @@ void myError(const char *message, const char *what, bool needHelp) {
     fprintf(stderr, "%s %s\n", message, what);
     if (needHelp) {
         printf("Try \"./find --help\" to learn more\n");
+        exit(EXIT_FAILURE);
     }
-    exit(EXIT_FAILURE);
 }
 
 
