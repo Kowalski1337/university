@@ -14,11 +14,10 @@ public class Main {
 
 
     static class Edge {
-        int id, backId;
+        int backId;
         int flow, capacity;
 
-        Edge(int capacity, int flow, int id, int backId) {
-            this.id = id;
+        Edge(int capacity, int flow, int backId) {
             this.backId = backId;
             this.capacity = capacity;
             this.flow = flow;
@@ -84,8 +83,8 @@ public class Main {
                 int f = in.nextInt() - 1;
                 int s = in.nextInt() - 1;
                 int capacity = in.nextInt();
-                edges.add(new Edge(capacity, 0, 2 * i, 2 * i + 1));
-                edges.add(new Edge(capacity, 0, 2 * i + 1, 2 * i));
+                edges.add(new Edge(capacity, 0, 2 * i + 1));
+                edges.add(new Edge(capacity, 0, 2 * i));
                 g.get(f).add(new Pair<>(s, 2 * i));
                 g.get(s).add(new Pair<>(f, 2 * i + 1));
             }
@@ -98,7 +97,7 @@ public class Main {
             int ans = 0;
             while (true) {
                 clear();
-                int d = dfs(n,0, Integer.MAX_VALUE);
+                int d = dfs(n, 0, Integer.MAX_VALUE);
                 ans += d;
                 if (d == 0) {
                     break;
