@@ -66,3 +66,5 @@ hs_err_pid*
 term4/OS/Find/cmake-build-ebug
 term4/OS/Jit/cmake-build-ebug
 *.in
+term4/Algo/Labs/MinCost/D/src/P1.java
+term4/Algo/Labs/MinCost/D/src/P2.java
