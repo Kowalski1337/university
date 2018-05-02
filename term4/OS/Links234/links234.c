@@ -18,7 +18,13 @@ int main() {
         fprintf(stderr, "Error: can't open lib3.so: %s\n", dlerror());
         return 0;
     };
+    dlerror();
     func = dlsym(dynlib, "the_most_intellectual_foo_ever_seen_linked");
+    if (dlerror()) {
+        fprintf(stderr, "Dlsym error\n");
+        dlclose(dynlib);
+        return 0;
+    }
     printf("%d\n", (*func)(3));
     dlclose(dynlib);
     return 0;
