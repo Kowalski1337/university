@@ -10,7 +10,7 @@ server:
 	./server.o
 
 client:
-	./client.o 7777
+	./client.o 1337
 
 clear:
 	rm -f *.o
