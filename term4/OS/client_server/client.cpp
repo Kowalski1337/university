@@ -9,11 +9,13 @@
 #include <string.h>
 #include <iostream>
 #include <cstdlib>
+#include "sender_getter.cpp"
+
 
 using namespace std;
 
 int main(int argc, char **argv) {
-    char *message = static_cast<char *>(malloc(100 * sizeof(char)));
+    char *message = static_cast<char *>(malloc(1000));
     char buf[sizeof(message)];
     int port;
 
@@ -23,7 +25,7 @@ int main(int argc, char **argv) {
     my_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (my_socket < 0) {
         perror("socket error");
-        exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
 
     addr.sin_family = AF_INET;
@@ -32,17 +34,31 @@ int main(int argc, char **argv) {
 
     if (connect(my_socket, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
         perror("connection error");
-        exit(EXIT_FAILURE);
+        exit(EXIT_SUCCESS);
     }
 
     while (true) {
         scanf("%s", message);
-        send(my_socket, message, sizeof(message), 0);
-        recv(my_socket, buf, sizeof(message), 0);
-        if (!strcmp(message, "0")) {
-            close(my_socket);
-            return 0;
+        //cout << "start client";
+        if (sender_getter::send_message(my_socket, message, sizeof(message)) == -1) {
+            break;
         }
-        printf("%s\n", buf);
+        //printf("sent");
+
+        //recv(my_socket, buf, sizeof(message), 0);
+        if (!strcmp(message, "0")) {
+            break;
+        }
+
+        char *temp = static_cast<char *>(malloc(1000));
+        if (sender_getter::get_mesage(my_socket, temp) == -1) {
+            break;
+        }
+
+        printf("%s\n", temp);
+
     }
+    close(my_socket);
+    free(message);
+    return 0;
 }
