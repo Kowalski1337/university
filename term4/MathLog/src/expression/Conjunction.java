@@ -1,8 +1,13 @@
 package expression;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 public class Conjunction extends BinaryOperator {
+
+    public boolean evaluate(HashMap<String, Boolean> values) {
+        return getLeft().evaluate(values) && getRight().evaluate(values);
+    }
 
 
     public Conjunction(Expression left, Expression right) {

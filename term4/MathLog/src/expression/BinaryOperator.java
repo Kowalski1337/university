@@ -7,13 +7,13 @@ public abstract class BinaryOperator implements Expression {
     Integer hash;
     private StringBuilder strImpl;
 
-    BinaryOperator(Expression left, Expression right, String key){
+    BinaryOperator(Expression left, Expression right, String key) {
         this.right = right;
         this.left = left;
         this.key = key;
     }
 
-    public String getKey(){
+    public String getKey() {
         return key;
     }
 
@@ -36,7 +36,7 @@ public abstract class BinaryOperator implements Expression {
         return strImpl.toString();
     }
 
-    public void write(StringBuilder sb){
+    public void write(StringBuilder sb) {
         sb.append('(');
         left.write(sb);
         sb.append(key);
