@@ -118,7 +118,7 @@ public class HW2 {
     public static void main(String[] args) throws Exception {
         BufferedWriter out = Files.newBufferedWriter(Paths.get("output.txt"), Charset.forName("UTF-8"));
         try (BufferedReader r = Files.newBufferedReader(Paths.get("input.txt"), Charset.forName("UTF-8"))) {
-            String[] header = r.readLine().split("\\|-");
+            String[] header = "\\|-".split(r.readLine());
             ArrayList<Expression> hypArr = new ArrayList<>(1000);
             if (!header[0].isEmpty()) {
                 String[] dataStrings = header[0].split(",");

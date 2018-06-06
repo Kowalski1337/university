@@ -1,5 +1,7 @@
 package expression;
 
+import java.util.HashMap;
+
 public interface Expression {
     void write(StringBuilder sb);
 
@@ -12,4 +14,6 @@ public interface Expression {
     Expression getLeft();
 
     Expression getRight();
+
+    boolean evaluate(HashMap<String, Boolean> values);
 }

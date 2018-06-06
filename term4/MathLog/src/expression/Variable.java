@@ -1,5 +1,6 @@
 package expression;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 public class Variable implements Expression {
@@ -8,6 +9,13 @@ public class Variable implements Expression {
     private Integer hash;
     //private String key;
 
+    public String getName() {
+        return name;
+    }
+
+    public String toString() {
+        return name;
+    }
 
     public Variable(String name) {
         this.name = name;
@@ -25,7 +33,7 @@ public class Variable implements Expression {
 
     @Override
     public String getKey() {
-        return "var";
+        return "";
     }
 
     @Override
@@ -36,6 +44,11 @@ public class Variable implements Expression {
     @Override
     public Expression getRight() {
         return null;
+    }
+
+    @Override
+    public boolean evaluate(HashMap<String, Boolean> values) {
+        return values.get(name);
     }
 
     @Override
