@@ -13,16 +13,7 @@ void my_error(char const * message){
 }
 
 void write_str(int path, char const *s) {
-    ssize_t cur = 0;
-    ssize_t len = static_cast<ssize_t>(strlen(s));
-    ssize_t tmp;
-    while (cur < len) {
-        tmp = write(path, s + cur, static_cast<size_t>(len - cur));
-        if (tmp == -1) {
-            my_error("Error was occurred while writing");
-        }
-        cur += tmp;
-    }
+    write_str(path, s, "Error was occurred while writing\n");
 }
 
 void write_str(int path, char const *s, char const* error) {
