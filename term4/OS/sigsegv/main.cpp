@@ -71,7 +71,7 @@ char *byte_to_string(uint8_t a) {
 }
 
 
-char const * regs[] = {"R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "RDI", "RSI", "RBP", "RBX", "RDX", "RAX", "RCX", "RSP", "RIP", "RFL", "CSGSFS", "ERR", "TRAPNO", "OLMASK", "CR2"};
+char const * regs[] = {"R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "RDI", "RSI", "RBP", "RBX", "RDX", "RAX", "RCX", "RSP", "RIP", "RFL", "CSGSFS", "ERR", "TRAPNO", "OLDMASK", "CR2"};
 
 void write_reg(mcontext_t *mcontext, size_t reg) {
     write_str(regs[static_cast<size_t >(reg)]);
@@ -88,7 +88,7 @@ void global_handler(int signum, siginfo_t *siginfo, void *context) {
 
     mcontext_t *mcontext = &reinterpret_cast<ucontext_t *>(context)->uc_mcontext;
 
-    for (size_t i = 0; i < 22; i++) {
+    for (size_t i = 0; i <= 22; i++) {
         write_reg(mcontext, i);
     }
 
