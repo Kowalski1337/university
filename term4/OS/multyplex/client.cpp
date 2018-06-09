@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <csignal>
-#include <bits/socket.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <cerrno>
@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
     while (client_pool != number_of_clients) {
         __FD_ZERO(&clientsSet);
         maxSocketDescriptor = clients[0];
-        for (int i = 0; i < number_of_clients; i++) {
-            curSock = clients[i];
+        for (int client : clients) {
+            curSock = client;
             if (curSock > 0) {
                 __FD_SET(curSock, &clientsSet);
             }
@@ -107,9 +107,9 @@ int main(int argc, char *argv[]) {
                 sprintf(curSock_str, "%d", curSock);
                 if (result < 0) {
                     //promise to myself realize formatted reading/writing(using function read/write and parser of format) 
-                    my_error("Client ");
-                    my_error(curSock_str);
-                    my_error(" is dead :(\n");
+                    write_str(1, "Client ");
+                    write_str(1, curSock_str);
+                    write_str(1, " is dead :(\n");
                 } else {
                     for (int i = 0; i < result; i++) {
                         if (buffer[i] >= 'a' && buffer[i] <= 'z') {
@@ -117,13 +117,13 @@ int main(int argc, char *argv[]) {
                         }
                     }
                     buffer[result] = '\n';
-                    my_error("Client ");
-                    my_error(curSock_str);
-                    my_error(" trying to answer\n");
-                    write_str(curSock, buffer, "Can't replied\n")
-                    my_error("Client ");
-                    my_error(curSock_str);
-                    my_error(" replied\n");
+                    write_str(1, "Client ");
+                    write_str(1, curSock_str);
+                    write_str(1, " trying to answer\n");
+                    write_str(curSock, buffer, "Can't replied\n");
+                    write_str(1, "Client ");
+                    write_str(1, curSock_str);
+                    write_str(1, " replied\n");
                 }
                 close(curSock);
                 client = 0;
@@ -131,6 +131,5 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    printf("I'm done\n");
     return 0;
 }
