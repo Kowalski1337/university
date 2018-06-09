@@ -70,61 +70,11 @@ char *byte_to_string(uint8_t a) {
     return ans;
 }
 
-char const * get_reg(int a) {
-    switch (a) {
-        case 0:
-            return "R8";
-        case 1:
-            return "R9";
-        case 2:
-            return "R10";
-        case 3:
-            return "R11";
-        case 4:
-            return "R12";
-        case 5:
-            return "R13";
-        case 6:
-            return "R14";
-        case 7:
-            return "R15";
-        case 8:
-            return "RDI";
-        case 9:
-            return "RSI";
-        case 10:
-            return "RBP";
-        case 11:
-            return "RBX";
-        case 12:
-            return "RDX";
-        case 13:
-            return "RAX";
-        case 14:
-            return "RCX";
-        case 15:
-            return "RSP";
-        case 16:
-            return "RIP";
-        case 17:
-            return "RFL";
-        case 18:
-            return "CSGSFS";
-        case 19:
-            return "ERR";
-        case 20:
-            return "TRAPNO";
-        case 21:
-            return "OLDMASK";
-        case 22:
-            return "CR2";
-        default:
-            return "";
-    }
-}
+
+char const * regs[] = {"R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "RDI", "RSI", "RBP", "RBX", "RDX", "RAX", "RCX", "RSP", "RIP", "RFL", "CSGSFS", "ERR", "TRAPNO", "OLMASK", "CR2"};
 
 void write_reg(mcontext_t *mcontext, size_t reg) {
-    write_str(get_reg(static_cast<int>(reg)));
+    write_str(regs[static_cast<size_t >(reg)]);
     write_str(" = ");
     write_str(to_string(static_cast<uint64_t>(mcontext->gregs[reg])));
     write_str("\n");
