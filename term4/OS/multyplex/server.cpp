@@ -1,12 +1,18 @@
-#include <cstdio>
-#include <cstdlib>
-#include <csignal>
-#include <cstring>
-#include <sys/socket.h>
+#include <sys/types.h>
 #include <netinet/in.h>
+#include <netdb.h>
+#include <sys/wait.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
-#include <cerrno>
+#include <netinet/in.h>
+#include <dirent.h>
+#include <errno.h>
 #include <cstdint>
 #include "utils.cpp"
 
@@ -20,7 +26,8 @@ char const *message = "hello, please help me, replace lower case with upper case
 char const *expected = "HELLO, PLEASE HELP ME, REPLACE LOWER CASE WITH UPPER CASE! THX, BRO!\n";
 
 int main(int argc, char *argv[]) {
-    signal(SIGPIPE, SIG_IGN);
+    //signal(SIGPIPE, SIG_IGN);
+    char *message_buf = new char[buffer_length];
     int opt = true;
     int masterSock, addrlen, clientSock, clients[max_number_of_clients], activity, curSock;
     int maxSocketDescriptor;
@@ -37,8 +44,8 @@ int main(int argc, char *argv[]) {
         my_error("Number of port should be uint16_t\n");
     }
 
-    for (int i = 0; i < max_number_of_clients; i++) {
-        clients[i] = 0;
+    for (int &client : clients) {
+        client = 0;
     }
 
     if ((masterSock = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
@@ -49,11 +56,15 @@ int main(int argc, char *argv[]) {
     }
 
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     address.sin_port = htons(static_cast<uint16_t>(port));
+    sprintf(message_buf, "sin_port - %d\n", address.sin_port);
+    write_str(1, message_buf);
     if (bind(masterSock, (struct sockaddr *) &address, sizeof(address)) < 0) {
-        my_error("Bind error\n");
+        //my_error("Bind error\n");
         //add more intellectual behavior when error was occurred
+        sprintf(message_buf, "Bind erorr %d \n", errno);
+        my_error(message_buf);
     }
 
     if (listen(masterSock, max_number_of_clients) < 0) {
@@ -97,13 +108,9 @@ int main(int argc, char *argv[]) {
             if ((clientSock = accept(masterSock, (struct sockaddr *) &address, (socklen_t *) &addrlen)) < 0) {
                 my_error("Can't accept client connection\n");
             }
-            write_str(1, "Client ");
-            char *clientSock_str = new char[11];
-            sprintf(clientSock_str, "%d", clientSock);
-            write_str(1, clientSock_str);
-            write_str(1, " connected\n Address - ");
-            write_str(1, inet_ntoa(address.sin_addr));
-            write_str(1, "\n");
+
+            sprintf(message_buf, "Client %d connected\n Addres - %s\n", curSock, inet_ntoa(address.sin_addr))
+            write_str(1, message_buf);
             //send message
             write_str(clientSock, message, "Can't send data\n");
             for (int &client : clients) {
@@ -124,10 +131,9 @@ int main(int argc, char *argv[]) {
                 }
                 close(curSock);
                 client = 0;
-                char *clientSock_str = new char[11];
-                sprintf(clientSock_str, "%d", curSock);
                 if (result >= 0) {
                     if (strcmp(buffer, expected) == 0) {
+                        sprintf(message_buf, "Client %d ", curSock)
                         write_str(1, "Client ");
                         write_str(1, clientSock_str);
                         write_str(1, " with address - ");

@@ -17,11 +17,13 @@ const int number_of_clients = 3;
  */
 
 int main(int argc, char *argv[]) {
-    signal(SIGPIPE, SIG_IGN);
+    //signal(SIGPIPE, SIG_IGN);
     if (argc != 3) {
         my_error("Incorrect number of args\n");
     }
     char *address = argv[1];
+    char *buffer = new char[buffer_length];
+    char *message_buf = new char[buffer_length];
 
     long port = strtol(argv[2], nullptr, 10);
     if (errno == ERANGE || port > UINT16_MAX || port <= 0) {
@@ -52,18 +54,14 @@ int main(int argc, char *argv[]) {
         timeout.tv_usec = 0;
 
         if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (char *) &timeout, sizeof(timeout)) < 0) {
-            my_error("Couldn't set socket option");
+            my_error("Couldn't set socket option\n");
         }
-        write_str(1, "Client ");
-        char *sock_str = new char[11];
-        sprintf(sock_str, "%d", sock);
-        write_str(1, sock_str);
-        write_str(1, " has connected to server\n");
+        sprintf(message_buf, "Client %d has connected to server\n", sock);
+        write_str(1, message_buf);
         clients[i] = sock;
     }
     int activity, curSock, maxSocketDescriptor;
     fd_set clientsSet{};
-    char buffer[buffer_length];
     int client_pool = 0;
     while (client_pool != number_of_clients) {
         __FD_ZERO(&clientsSet);
@@ -102,29 +100,25 @@ int main(int argc, char *argv[]) {
             curSock = client;
 
             if (FD_ISSET(curSock, &clientsSet)) {
-                int result = read_str(curSock, buffer);
-                char *curSock_str = new char[11];
-                sprintf(curSock_str, "%d", curSock);
-                if (result < 0) {
-                    //promise to myself realize formatted reading/writing(using function read/write and parser of format) 
-                    write_str(1, "Client ");
-                    write_str(1, curSock_str);
-                    write_str(1, " is dead :(\n");
-                } else {
-                    for (int i = 0; i < result; i++) {
-                        if (buffer[i] >= 'a' && buffer[i] <= 'z') {
-                            buffer[i] = 'A' + buffer[i] - 'a';
-                        }
+                sprintf(message_buf, "CLient %d can't read info\n", curSock);
+                int result = read_str(curSock, buffer, message_buf);
+
+                /*sprintf(message_buf, "\n\n\n\n IA DAUN IA PROCHITAL %s PROVERIYI \n  AND MY NAME IS %d\n\n\n\n", buffer, curSock);
+                write_str(1, message_buf);*/
+
+                for (int i = 0; i < result; i++) {
+                    if (buffer[i] >= 'a' && buffer[i] <= 'z') {
+                        buffer[i] = 'A' + buffer[i] - 'a';
                     }
-                    buffer[result] = '\n';
-                    write_str(1, "Client ");
-                    write_str(1, curSock_str);
-                    write_str(1, " trying to answer\n");
-                    write_str(curSock, buffer, "Can't replied\n");
-                    write_str(1, "Client ");
-                    write_str(1, curSock_str);
-                    write_str(1, " replied\n");
                 }
+
+                buffer[result] = '\n';
+                sprintf(message_buf, "Client %d trying to reply\n", curSock);
+                write_str(1, message_buf);
+                write_str(curSock, buffer, "Can't replied\n");
+                sprintf(message_buf, "Client %d replied\n", curSock);
+                write_str(1, message_buf);
+
                 close(curSock);
                 client = 0;
                 client_pool++;
