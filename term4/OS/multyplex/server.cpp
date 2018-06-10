@@ -23,7 +23,7 @@ const int max_number_of_clients = 3;
  */
 
 char const *message = "hello, please help me, replace lower case with upper case! thx, bro!\n";
-char const *expected = "HELLO, PLEASE HELP ME, REPLACE LOWER CASE WITH UPPER CASE! THX, BRO!\n";
+char const *expected = "HELLO, PLEASE HELP ME, REPLACE LOWER CASE WITH UPPER CASE! THX, BRO!\n\n";
 
 int main(int argc, char *argv[]) {
     //signal(SIGPIPE, SIG_IGN);
@@ -58,12 +58,10 @@ int main(int argc, char *argv[]) {
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     address.sin_port = htons(static_cast<uint16_t>(port));
-    sprintf(message_buf, "sin_port - %d\n", address.sin_port);
-    write_str(1, message_buf);
+    /*sprintf(message_buf, "sin_port - %d\n", address.sin_port);
+    write_str(1, message_buf);*/
     if (bind(masterSock, (struct sockaddr *) &address, sizeof(address)) < 0) {
-        //my_error("Bind error\n");
-        //add more intellectual behavior when error was occurred
-        sprintf(message_buf, "Bind erorr %d \n", errno);
+        sprintf(message_buf, "Bind error %d \n", errno);
         my_error(message_buf);
     }
 
@@ -109,10 +107,14 @@ int main(int argc, char *argv[]) {
                 my_error("Can't accept client connection\n");
             }
 
-            sprintf(message_buf, "Client %d connected\n Addres - %s\n", curSock, inet_ntoa(address.sin_addr))
+            sprintf(message_buf, "Client %d connected\n Addres - %s\n", clientSock, inet_ntoa(address.sin_addr));
             write_str(1, message_buf);
             //send message
-            write_str(clientSock, message, "Can't send data\n");
+            //write_str(clientSock, message, "Can't send data\n");
+            int sent = send_to_sock(clientSock, message);
+            if (sent < 0) {
+                my_error("Error was occurred while reading\n");
+            }
             for (int &client : clients) {
                 if (client == 0) {
                     client = clientSock;
@@ -125,18 +127,22 @@ int main(int argc, char *argv[]) {
         for (int &client : clients) {
             curSock = client;
             if (FD_ISSET(curSock, &clientsSet)) {
-                int result = read_str(curSock, buffer);
+                int result = read_from_sock(curSock, buffer);
                 if (getpeername(curSock, (struct sockaddr *) &address, (socklen_t *) &addrlen) == -1) {
                     my_error("Can't get address of the peer connected to the socket\n");
                 }
                 close(curSock);
                 client = 0;
+                buffer[result - 1] = '\n';
                 if (result >= 0) {
                     if (strcmp(buffer, expected) == 0) {
-                        sprintf(message_buf, "Client %d with address - %s replied correctly\n", curSock, inet_ntoa(address.sin_addr));
+                        sprintf(message_buf, "Client %d with address - %s replied correctly\n", curSock,
+                                inet_ntoa(address.sin_addr));
                         write_str(1, message_buf);
                     } else {
-                        sprintf(message_buf, "Client %d with address - %s replied wrong\nexpected: %s\nfound: %s\n", curSock, inet_ntoa(address.sin_addr), expected, buffer);
+                        //printf("%d %d\n", static_cast<int>(strlen(buffer)), static_cast<int>(strlen(expected)));
+                        sprintf(message_buf, "Client %d with address - %s replied wrong\nexpected: %sfound: %s",
+                                curSock, inet_ntoa(address.sin_addr), expected, buffer);
                         write_str(1, message_buf);
                         isEnd = true;
                     }
@@ -146,8 +152,8 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-        if (isEnd){
-            for (int &client : clients){
+        if (isEnd) {
+            for (int &client : clients) {
                 close(client);
             }
             close(masterSock);

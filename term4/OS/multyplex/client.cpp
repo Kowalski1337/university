@@ -17,7 +17,7 @@ const int number_of_clients = 3;
  */
 
 int main(int argc, char *argv[]) {
-    //signal(SIGPIPE, SIG_IGN);
+
     if (argc != 3) {
         my_error("Incorrect number of args\n");
     }
@@ -100,8 +100,12 @@ int main(int argc, char *argv[]) {
             curSock = client;
 
             if (FD_ISSET(curSock, &clientsSet)) {
-                sprintf(message_buf, "CLient %d can't read info\n", curSock);
-                int result = read_str(curSock, buffer, message_buf);
+                sprintf(message_buf, "Client %d can't read info\n", curSock);
+                int result = read_from_sock(curSock, buffer);
+
+                if (result < 0) {
+                    my_error("Error was occurred while reading\n");
+                }
 
                 /*sprintf(message_buf, "\n\n\n\n IA DAUN IA PROCHITAL %s PROVERIYI \n  AND MY NAME IS %d\n\n\n\n", buffer, curSock);
                 write_str(1, message_buf);*/
@@ -112,10 +116,18 @@ int main(int argc, char *argv[]) {
                     }
                 }
 
+                if (rand() % 3 == 0){
+                    buffer[0] = 'h';
+                }
+
                 buffer[result] = '\n';
                 sprintf(message_buf, "Client %d trying to reply\n", curSock);
                 write_str(1, message_buf);
-                write_str(curSock, buffer, "Can't replied\n");
+                //write_str(curSock, buffer, "Can't replied\n");
+                int sent = send_to_sock(curSock, buffer);
+                if (sent < 0) {
+                    my_error("Error was occurred while writing\n");
+                }
                 sprintf(message_buf, "Client %d replied\n", curSock);
                 write_str(1, message_buf);
 
