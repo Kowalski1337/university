@@ -133,31 +133,16 @@ int main(int argc, char *argv[]) {
                 client = 0;
                 if (result >= 0) {
                     if (strcmp(buffer, expected) == 0) {
-                        sprintf(message_buf, "Client %d ", curSock)
-                        write_str(1, "Client ");
-                        write_str(1, clientSock_str);
-                        write_str(1, " with address - ");
-                        write_str(1, inet_ntoa(address.sin_addr));
-                        write_str(1, "replied correctly\n");
+                        sprintf(message_buf, "Client %d with address - %s replied correctly\n", curSock, inet_ntoa(address.sin_addr));
+                        write_str(1, message_buf);
                     } else {
-                        write_str(1, "Client ");
-                        write_str(1, clientSock_str);
-                        write_str(1, " with address - ");
-                        write_str(1, inet_ntoa(address.sin_addr));
-                        write_str(1, "replied wrong\n");
-                        write_str(1, "expected: ");
-                        write_str(1, expected);
-                        write_str(1, "\nfound: ");
-                        write_str(1, buffer);
-                        write_str(1, "\n");
+                        sprintf(message_buf, "Client %d with address - %s replied wrong\nexpected: %s\nfound: %s\n", curSock, inet_ntoa(address.sin_addr), expected, buffer);
+                        write_str(1, message_buf);
                         isEnd = true;
                     }
                 } else {
-                    write_str(1, "Client ");
-                    write_str(1, clientSock_str);
-                    write_str(1, " with address - ");
-                    write_str(1, inet_ntoa(address.sin_addr));
-                    write_str(1, "is dead :(\n");
+                    sprintf(message_buf, "Client %d with address - %s is dead\n", curSock, inet_ntoa(address.sin_addr));
+                    write_str(1, message_buf);
                 }
             }
         }
