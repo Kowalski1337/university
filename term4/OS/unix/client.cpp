@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
         my_error("Recvmsg error\n");
     }
     memcpy(&fd, CMSG_DATA(cmsg), sizeof(fd));
-    write_str(1, "Input your text.\nAfter that it will be reverse and all letters  and input in file\n"
+    write_str(1, "Input your text.\nAfter that it will be reverse and all letters will be replaced with capital letters and input in file\n"
                    "To finish work send '!close'\n"
                    "To finish work of client and server send !close_server\n");
     bool checker = true;
