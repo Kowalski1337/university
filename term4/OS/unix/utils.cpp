@@ -12,9 +12,7 @@ void my_error(char const * message){
     exit(EXIT_FAILURE);
 }
 
-void write_str(int path, char const *s) {
-    write_str(path, s, "Error was occurred while writing\n");
-}
+
 
 void write_str(int path, char const *s, char const* error) {
     ssize_t cur = 0;
@@ -27,4 +25,8 @@ void write_str(int path, char const *s, char const* error) {
         }
         cur += tmp;
     }
+}
+
+void write_str(int path, char const *s) {
+    write_str(path, s, "Error was occurred while writing\n");
 }
